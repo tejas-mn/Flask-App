@@ -46,7 +46,7 @@ def update_days_left():
         deadline_date = datetime.strptime(row.deadline, "%Y-%m-%d").date()
         days_left = (str(deadline_date - current_date))
         
-        print(row.deadline,days_left)
+        #print(row.deadline,days_left)
         if deadline_date != current_date:
             days_left = int(days_left.split(' ')[0])
         else:
