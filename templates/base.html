@@ -1,0 +1,92 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title> {{title}}</title>
+        <meta name="viewport" content="width=device-width ,initial-scale=1.0">
+        <link rel="stylesheet" href= "{{ url_for('static', filename= 'css/style.css' )}}" />
+        <script src="{{ url_for('static', filename='js/jquery.js')}}">  </script>
+        <script src="{{ url_for('static', filename='js/jquery-ui.js')}}"> </script>
+        <link href="{{ url_for('static', filename='css/jquery-ui.css')}}" rel="stylesheet" type="text/css" />
+    </head>
+
+    <body>
+        <header><h1 style="color:black;">&lt&ltFLASK CRUD APP&gt&gt</h1></header>
+        <div class="navbar">
+                <ul>
+                    <li><a href="/home">Home</a></li>
+                    <li><a href="/dashboard">Dashboard </a></li>
+                    <li><a href="/about">About </a></li>
+                    <li id="logout" ><a style="color: cornsilk;" href="/logout"> Log Out </a></li>
+                    <li id="acc" ><a style="color: cornsilk;" href="/signin">Sign In | Log In </a></li>
+                    <!--<li><a href="/login">Log In </a></li>-->
+
+                </ul>
+        </div>
+        <br>
+
+        <section>
+            {% for messages in  get_flashed_messages() %}
+            {% if messages %}
+                <div class = "flsh" style=" text-align: center;
+                                        border-radius:10px;
+                                        background-color: rgb(250, 58, 0);
+                                        color: rgb(255, 255, 255);
+                                        width: 70%;
+                                        margin: 10px auto;
+                                        padding: 5px ;"
+                                        >
+                    <h3>{{ messages }} </h3>
+                </div>
+            <h3>{{msg}}</h3>
+            {% endif %}
+            {% endfor %}
+            
+            {%block dues%}
+            {%endblock dues%}
+            {% block upload%}
+            {% endblock upload%}
+            {% block home %}
+            {% endblock %}
+            {% block fof %}
+            {% endblock %}
+            {% block content %}
+            {% endblock %}
+            {% block form %}
+            {% endblock %}
+            {% block addnew %}
+            {% endblock %}
+            {% block search %}
+            {% endblock %}
+            {% block se %}
+            {% endblock %}
+            {% block signin %}
+            {% endblock %}
+            {% block login %}
+            {% endblock %}
+        </section>
+
+        <br><br>
+
+        <footer style="text-align: center;">
+            <hr>
+            <cite>Created using <br>Python | Flask | HTML | CSS | Javascript | JQuery<br> 2020-2021</cite>
+            <br><br>
+        </footer>
+
+        <script type="text/javascript">
+            
+            var is_loggedin = "{{session.logged_in}}"
+            var style=document.getElementById('logout').style;
+            if(is_loggedin=="True"){
+
+                    style.visibility = "visible";
+                    style.display='flex';
+            }
+
+            setTimeout(function(){
+                $('.flsh').fadeOut('slow');
+            } , 3000);
+            
+        </script>
+    </body>
+</html>

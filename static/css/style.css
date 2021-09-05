@@ -1,0 +1,305 @@
+body {
+    margin: 0;
+    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+    font-size: 14px;
+}
+
+.navbar ul {
+    /*to eliminate box model for ul*/
+    padding: 8px;
+    list-style-type: none;       /*eliminates bullet points*/
+    /*text-align: center;*/
+    background-color:rgb(239 239 239);
+    margin: 10px;
+    border-radius: 5px;
+}
+
+.navbar ul li {
+    display: inline-flex;
+}
+
+.navbar ul li a {
+    text-decoration: none; /*get rid of underline*/
+    font-family:'Times New Roman', Times, serif;
+    font-size: large;
+    padding: 8px;
+    color: rgb(0, 0, 0);
+    /*background-color: rgb(31, 29, 29); /*to match navbar*/
+    transition: .3s;
+}
+
+.navbar ul li a:hover {
+    cursor: pointer;
+    filter:drop-shadow(0px 0px 20px  rgb(255, 255, 255));
+    /*padding: 20px;*/
+    color: rgb(255, 255, 255);
+    background-color:teal; /*to match navbar*/
+}
+
+h1 {
+    color: #000080;
+    text-align: center;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+}
+#acc{
+    float: right;
+    background-color: teal;
+}
+#logout{
+    visibility: hidden;
+    display: none;
+    float:right;
+    background-color:rgb(150, 0, 209);
+    margin-left: 15px;
+}
+
+#logout:hover{
+
+    background-color: rgb(14, 14, 5);
+    color:black;
+}
+table {
+    margin: auto;
+    border-radius: 10px;
+
+}
+
+.table-header{
+    background-color:rgb(142, 12, 202);
+    font-family:'Comic Sans MS',cursive,sans-serif;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+    font-weight: bold;
+    font-size: large;
+}
+
+header {
+    border: 2px solid black;
+    margin: 10px;
+    background-image: linear-gradient(to bottom left, #ffd500 ,#ff0);
+}
+
+#customers {
+    filter: drop-shadow(2px 4px 6px black);
+    font-family: Arial, Helvetica, sans-serif;
+    border-collapse: collapse;
+    width:90%;
+    text-align: center;
+}
+
+#customers td, #customers th {
+    border: 9px solid #ddd;
+    padding: 15px;
+    color: white;
+}
+
+/*
+#customers tr:nth-child(even){
+    background-color: #f2f2f2;
+} */
+
+#customers {
+    background-color: rgb(70, 62, 251);
+    background-blend-mode: darken;
+}
+
+#customers tr:hover {
+    background-color: rgb(16, 0, 236);
+
+}
+
+#customers th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    text-align: center;
+    background-color: #4caf50;
+    color: white;
+}
+
+/*--------------------------------Search Add NEW Button-----------------------*/
+
+.inp  {
+    background-color: white !important;
+    border: 3px solid green;
+    border-radius: 5px;
+    padding: 6px 12px;
+    text-align: center;
+    text-decoration: none;
+    color:black;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+input[type="file"]{
+    display: none;
+}
+
+
+
+.inpsearch {
+    background-color: white;
+    border: 3px solid green;
+    border-radius: 5px;
+    padding: 6px 12px;
+    text-align: center;
+    text-decoration: none;
+    margin: 2px;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+.inpsearch:hover {
+    cursor:pointer;
+    background-color: rgb(24, 176, 214);
+    color: rgba(255, 250, 250, 1);
+    border: 3px solid white;
+}
+
+.inp_del {
+    color:white;
+    background-color: crimson;
+    border: 3px solid white;
+    border-radius: 5px;
+    padding: 6px 12px;
+    text-align: center;
+    text-decoration: none;
+    margin: 2px;
+    font-family:Arial, Helvetica, sans-serif;
+}
+.inp:hover {
+    color: black;
+    background-color:whitesmoke;
+    cursor:pointer;
+    border: 3px solid rgb(89, 0, 255);
+
+}
+.inp_del:hover {
+    background-color: rgb(22, 12, 5);
+    color: rgba(255, 250, 250, 1);
+    border: 3px solid white;
+    cursor:pointer;
+}
+
+/*----------------------------Update-Delete Button---------------------*/
+#up_btn {
+    background-color: #fff;
+    color: black;
+    border: 1px solid rgb(0, 0, 0);
+    /*border-radius: 10px;*/
+
+    padding: 6px 12px;
+    text-align: center;
+    text-decoration: none;
+    display:inline-block;
+    margin: 0 auto;
+    margin-bottom: 5px;
+
+}
+
+#up_btn:hover {
+    background-color: rgba(0, 255, 0, 0.753);
+    color: rgba(255, 250, 250, 1);
+    border: 1px solid rgb(0, 0, 0);
+   cursor: pointer;
+}
+
+#del_btn {
+    color: black;
+    background-color: white;
+    border: 1px solid rgb(0, 0, 0);
+    /*border-radius: 10px;*/
+    padding: 6px 12px;
+    text-align: center;
+    text-decoration: none;
+    display:inline-block;
+    margin: 0 auto;
+    margin-bottom: 5px;
+
+}
+
+#del_btn:hover {
+    background-color: rgb(255, 0, 0);
+    color: rgba(255, 250, 250, 1);
+    border: 1px solid rgb(0, 0, 0);
+    cursor: pointer;
+}
+
+.srch{
+    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+    width: 50%;
+    padding: 6px;
+    border: 2px solid #ccc;
+    border-radius: 5px;
+    outline: none;
+    text-decoration: none;
+    transition: .3s;
+    word-spacing: 4pt;
+}
+
+.form{
+    width: 90%;
+    /*to eliminate box model for ul*/
+    color:white;
+    padding:20px;
+    list-style-type: none;       /*eliminates bullet points*/
+    text-align: center;
+    background-color: rgba(0, 0, 0, 0.795);
+    margin:auto ;
+    border-radius: 5px;
+    box-sizing: border-box;
+
+}
+
+#txtarea{
+    font-family:
+    "Palatino Linotype", "Book Antiqua", Palatino, serif;
+
+    resize:vertical; width:50% ;height: 240px ;
+}
+
+pre{
+    font-family:"Palatino Linotype", "Book Antiqua", Palatino, serif;
+    text-align:left;
+    white-space: pre-wrap;
+    white-space: -moz-pre-wrap;
+    word-wrap: break-word;
+}
+
+.modal{
+    border: 2px solid chartreuse;
+    color:white;
+    background: rgba(0, 0, 0,1) !important;
+}
+.modal a.close-modal {
+    filter: invert(1);
+    transition: .4s;
+}
+.modal a.close-modal:hover{
+    transform: rotateZ(80deg)
+}
+
+#sel{
+    
+    float: right;
+}
+
+@media screen  and (max-width:470px){
+
+    #acc{
+        margin-top: 5px;
+        float: none;
+    }
+    .srch{
+        width: 80%;
+    }
+    #txtarea{
+        width: 80%;
+    }
+    #sel{
+        float: none;
+    }
+    .inp_del{
+        margin-top:5px;
+    }
+    .inp{
+        margin-top:5px;
+    }
+}

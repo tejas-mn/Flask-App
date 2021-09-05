@@ -1,0 +1,150 @@
+{%extends "base.html" %}
+{%block dues %}
+
+    <style>
+        h2{
+            margin-top:0px;
+            /*background:linear-gradient(120deg,  #CCFFFF, #CCCCFF); ;*/
+            padding: 15px;
+            box-shadow: 0px 5px 6px -2px #000000;
+            color:white;
+        }
+
+        .card{
+
+            margin: 10px auto;
+            background-color:   #F7F7F7;
+            /*background: linear-gradient(60deg,  #CCFFFF, #CCCCFF);*/
+            display: inline-block;
+            position:relative;
+            padding:5px;
+            text-align: center;
+            width:360px;
+            border-radius:10px;
+            transition: .3s;
+
+            animation-name:twinkle-1;
+            animation-duration: 1s;
+            animation-iteration-count: 1;
+        }
+
+
+        #expired:hover{
+
+            box-shadow: 0px 0px 28px red ,0px 10px 10px black;
+        }
+
+        #today:hover{
+            box-shadow: 0px 0px 28px green ,0px 10px 10px black;
+        }
+
+        #tommorrow:hover{
+            box-shadow: 0px 0px 28px #FF6633 ,0px 10px 10px black;
+        }
+
+        #lweek:hover{
+            box-shadow: 0px 0px 28px #CC6699 ,0px 10px 10px black;
+        }
+
+        #gweek:hover{
+            box-shadow: 0px 0px 28px #CD6609 ,0px 10px 10px black;
+        }
+
+
+
+        li{
+            text-align: left !important;
+            font-size: larger;
+
+        }
+
+        .dd{
+            display: flex;
+            align-items:  normal; /* change to see changes */
+            flex-wrap:  wrap;
+        }
+
+        a{
+            text-decoration: none;
+        }
+
+        @keyframes twinkle-1 { 50% { opacity:0.5; transform:scale(95%); } }
+
+
+    </style>
+
+    <h1>Deadlines</h1>
+
+    <div class="dd">
+
+    <div class="card" id="expired">
+        <h2 style="background-color: red;">Expired</h2>
+
+        <ol>
+        {% for row in Data.query.filter(Data.username==session.username).filter(Data.days_left<0 )%}
+            <a href="/details/{{row.id}}"><li>{{row.name}} {{row.status}}</li><br> </a>
+
+
+
+        {% endfor%}
+        </ol>
+
+    </div>
+    <br><br>
+    <div class="card card-1" id="today">
+        <h2 style="background-color: green;">Today</h2>
+
+        <ol>
+        {% for row in Data.query.filter(Data.username==session.username).filter(Data.days_left==0 )%}
+            <a href="/details/{{row.id}}"><li>{{row.name}} {{row.status}}</li><br></a>
+        {% endfor%}
+        </ol>
+    </div>
+    <br><br>
+    <div class="card card-2" id="tommorrow">
+        <h2 style="background-color: #FF6633;">Tommorrow</h2>
+
+
+        <ol>
+            {% for row in Data.query.filter(Data.username==session.username).filter(Data.days_left==1 )%}
+            <a href="/details/{{row.id}}"><li>{{row.name}} {{row.status}}</li><br></a>
+            {% endfor%}
+        </ol>
+
+
+    </div>
+    <br>    <br>
+    <div class="card card-3" id="lweek">
+        <h2 style="background-color:  #CC6699;">&lt Week</h2>
+
+        <ol>
+
+            {% for row in Data.query.filter(Data.username==session.username).filter(Data.days_left>1).filter(Data.days_left<8)%}
+            <a href="/details/{{row.id}}"><li>{{row.name}} {{row.status}}</li><br></a>
+            {% endfor%}
+        </ol>
+
+
+    </div>
+    <br>        <br>
+    <div class="card card-4" id="gweek">
+        <h2 style="background-color:  #CD6609;">&gt Week</h2>
+
+
+        <ol>
+            {% for row in Data.query.filter(Data.username==session.username).filter(Data.days_left>7 )%}
+            <a href="/details/{{row.id}}"><li>{{row.name}} {{row.status}}</li><br> </a>
+            {% endfor%}
+        </ol>
+
+
+    </div>
+    </div>
+
+    <script>
+       // $('li').hover(function(){
+         //   $('#btns').css("display","inline");
+        //})
+
+    </script>
+{% endblock dues %}

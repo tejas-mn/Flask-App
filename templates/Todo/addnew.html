@@ -1,0 +1,37 @@
+{%extends "base.html" %}
+{%block addnew %}
+        <form class="form" action="{{url_for('insert')}}" method="POST">
+            <hr><h2 style="background-color: rgb(38, 38, 43); padding: 20px;" >Enter the Details</h2><hr><br>
+            <label > Title:  <br><input  placeholder="Your Title Goes Here.." class="srch" type="text"  size="36" name="name" required/></label>
+            <br>
+            <br>
+            <label> Description: <br>  <textarea  id = "txtarea" placeholder="Your Description Goes Here.."  class="srch"   name="desc"></textarea></label>
+            <br>
+            <br>
+            <label> DeadLine:  <br><input required class="srch" type="date"   id = "deadline" name="deadline"/></label>
+            <br>
+            <br>
+            <label> <input name="date" value="" id="CurDate" hidden> </label>
+            <input class="inp" type="submit" />
+        </form>
+        
+        <script type="text/javascript">
+                var d = new Date();
+
+                var day= d.getUTCDate()
+                var month=d.getUTCMonth()+1
+                var year=d.getUTCFullYear()
+
+                if(month<10)
+                        month = '0'+ month.toString();
+                if(day<10)
+                        day = '0' + day.toString();
+
+                var CurrDate = year + '-' + month + '-' + day
+
+                $('#deadline').attr('min',CurrDate)
+
+                document.getElementById('CurDate').value = CurrDate
+
+        </script>
+{% endblock addnew %}

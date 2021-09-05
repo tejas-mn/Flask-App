@@ -1,0 +1,56 @@
+{%extends "base.html" %}
+{%block form%}
+        <form class="form" action="{{url_for('edit')}}" method="POST">
+            <hr><h2 style="background-color: rgb(38, 38, 43); padding: 20px;" >Edit the Details</h2> <hr><br>
+            <input type="hidden" value={{id}} name="id"/>
+            <label > Title:  <br><input class="srch" type="text"  size="36" name="name" value='{{Data.query.get(id).name}}' />
+            </label>
+            <br><br>
+            <label>
+            Description:   <br><textarea class="srch" type="text" id="txtarea"  name="desc" value= >{{Data.query.get(id).desc}}</textarea>
+            </label>
+            <br><br>
+            <label>
+            Deadline:  <br><input required class="srch" type="date"  name="deadline" id="deadline" value='{{Data.query.get(id).deadline}}' />
+            </label>
+            <br><br>
+            <label>Status: <br>Finished<input type="radio" id="T" name="status" value='✔️'/></label>
+            | Unfinished<input type="radio" name="status" id="F" value='❌' />
+            <br><br>
+            <label> <input name="date" value="" id="ModifiedDate" hidden> </label>
+            <input class="inp" type="submit"/>
+        </form>
+
+        <script >
+            var x = "{{Data.query.get(id).status}}";
+            if(x=="✔️")
+            {
+                    alert("Task Finished✔️");
+                    document.getElementById("T").checked="True";
+            }
+            else
+            {
+                alert("Task Unfinshed❌");
+                document.getElementById("F").checked="True";
+            }
+
+            var d = new Date();
+
+            var day= d.getUTCDate()
+            var month=d.getUTCMonth()+1
+            var year=d.getUTCFullYear()
+
+            if(month<10)
+                    month = '0'+ month.toString();
+            if(day<10)
+                    day = '0' + day.toString();
+
+            var CurrDate = year + '-' + month + '-' + day
+
+            $('#deadline').attr('min',CurrDate)
+
+            document.getElementById('ModifiedDate').value = CurrDate
+
+        </script>
+        
+{%endblock form%}

@@ -1,0 +1,64 @@
+{%extends "base.html" %}
+{%block signin %}
+
+    <form class="form" action="{{url_for('signin')}}" method="POST">
+            <p>{% if session.logged_in%} You are logged in as {{session.username}} {% endif %}</p>
+
+            <hr><h2 style="background-color: rgb(38, 38, 43); padding: 20px;" >SIGNIN</h2><hr><br>
+            <label> Name:  <br><input autocomplete="on" required placeholder="Enter your name" class="srch" type="text"  size="36" name="username"/></label>
+            <br><br>
+            <label> Email:  <br><input autocomplete="on" required placeholder="Enter your email" class="srch" type="email"  size="36" name="email"/></label>
+            <br><br>
+            <label> Password:  <br><input id="[swd" autocomplete="on" required placeholder="Enter your password" class="srch" type="password"  size="36" name="password"/></label>
+            <br><br>
+            <p id="StrengthDisp" style=" display : none; margin: 10px; padding: 10px; width: 50%; margin: auto; word-wrap: break-word; border-radius: 5px;" ></p>
+
+            <br><br>
+
+            <p>Already have an account? <u><a style="text-decoration:none; color: rgb(163, 212, 255); " href="/login">Login</a></u></p>
+            <input class="inp" type="submit" value="Sign In">
+        </form>
+
+
+        <script type="text/javascript">
+            var valid = false;
+            $('input[type=password]').keyup(
+                function(){
+                var pswd  = $(this).val();
+
+                    if(pswd.match('(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{8,})')){
+                        $('#StrengthDisp').html("Weak").css("background-color","green")
+                        valid=true
+                    }
+                    else if(pswd.match('((?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{6,}))|((?=.*[a-z])(?=.*[A-Z])(?=.*[^A-Za-z0-9])(?=.{8,}))')){
+                        $('#StrengthDisp').html("Strong").css("background-color","red")
+                        valid = true
+                    }
+                    else{
+                        $('#StrengthDisp').html("Password must be atleast 8 charcters long and should contain atleast 1 digit/lowercase/uppercase and special character").css("background-color","blue")
+                        valid=false
+                    }
+                }
+            ).focus(
+                function(){
+                    //console.log(valid)
+                    $('#StrengthDisp').show()
+                }
+            ).blur(
+                function(){
+                    $('#StrengthDisp').hide()
+                }
+            )
+
+            $('.form').on("submit",function(e){
+                e.preventDefault();
+                if(!valid){
+                    alert("Password too Weak!!")
+                }
+                else{
+                    this.submit();
+                }
+            })
+
+        </script>
+{% endblock signin %}

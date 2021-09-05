@@ -1,0 +1,216 @@
+<script src="{{ url_for('static', filename='js/jquery.min.js')}}"> </script>
+<script src="{{ url_for('static', filename='js/jquery.modal.min.js')}}"> </script>
+<link href="{{ url_for('static', filename='css/jquery.modal.min.css')}}" rel="stylesheet" type="text/css" />
+
+{%extends "base.html" %}
+{% block content %}
+
+
+{% if title == "Search Results" %}
+        <h1>Search Results for "{{txt}}"</h1>
+    {%endif%}
+    <br>
+        <!--------------------Form Table----------------------------->
+        <form id="Ntng">
+            <table id="customers" aria-colspan="1">
+                <td class="table-header" colspan="7" >
+                    <div style="text-align: left; align-items: center;">📜TODO APP📝
+                    <div id="ProfilePic" style="float: right; margin: 8px;">
+                        <a  href="#profile" rel="modal:open">
+                        <img alt="Click to Choose Profile Picture" src="{{ url_for('static', filename='/images/'+ session['username'] + '//' + image )}}" style="
+                        font-size: small;
+                        background-color: azure;
+                        color: black;
+                        border-radius: 100px;
+                        border:2px solid white;
+                        width: 80px;
+                        height: 80px; ">
+
+                    </a>
+                    </div>
+                            <h2 >Welcome {{session.username}}</h2>
+
+                    <hr>
+                    <input style="width: min-content;" value="{{txt}}" type="text" class="srch" id = "search-bar" name="txt" placeholder="Search todos" >
+
+                    <select class="inp" id="sel" style="outline: none; " >
+                        <option disabled selected  style="display: none;">Filter</option>
+                        <option class="inp" value="1" >All</option>
+                        <option class="inp" id="done" value="2">Finished✔️</option>
+                        <option class="inp" id="undone"value="3">Unfinshed❌</option>
+                    </select>
+
+                    <input type="button" value="New Todo🖊️" class="inp"  onclick="window.location='/addnew' ">
+                    <input type="button"  class="inp" onclick="window.location='/dues' " value="View Deadlines📆">
+                    <input type="button" class="inp_del"  value=" Delete All🗑️" onclick="return deleteall();">
+                    </div>
+                </td>
+                <tr>
+                    <th>#</th>
+                    <th>Task Name</th>
+                    <th>Status</th>
+                    <th>Edit </th>
+                </tr>
+                <div id="main">
+
+                {% for row in Data_Paginate.items %}
+                <tr>
+                  <td onclick="window.location='/details/{{row.id}}'">{{row.serial_no}}</td>
+
+                    <td onclick="window.location='/details/{{row.id}}'">{{row.name}}</td>
+
+                  <td onclick="window.location='/details/{{row.id}}'"><h2 style="filter:contrast(80);">{{row.status}}</h2></td>
+                  <td>
+                        <centre>
+                        <a  href="/update/{{row.id}}"   id="up_btn" >⚙️</a>
+                        <a  href="/delete/{{row.id}}"  id="del_btn" onclick="return fun('{{row.status}}');">🗑️</a>
+                        <!-- <a  href="#"  class="del_btn" id="{{row.id}}" >🗑️</a>-->
+                        </centre>
+                    </td>
+                </tr>
+                {% endfor %}
+                </div>
+            </table>
+        </form>
+
+        <div id="profile" class="modal" style="background:rgb(142, 12, 202)  !important; ">
+                        
+                
+            <img id="pic" alt="No Profile Picture" src="{{ url_for('static', filename='/images/'+ session['username'] + '//' + image )}}" style="
+                            font-size: small;
+                            background-color: azure;
+                            color:black;
+                            border-radius: 100px;
+                            border:2px solid white;
+                            width: 100px;
+                            height: 100px;
+                            margin: auto;">
+
+                            <p>Name : {{UserData.query.filter(UserData.username==(session.username)).first().username}}</p>
+                            <p>Email : {{UserData.query.filter(UserData.username==(session.username)).first().email}}</p>
+                            <p>Task Score : {{Data.query.filter(Data.username==(session.username)).filter_by(status="✔️").count() }} / {{Data.query.filter_by(username=session.username).count() }}</p>
+                            
+            <br><br>
+            <form method="POST" action="/upload_image" enctype="multipart/form-data">
+                Select Profile Pic :  <label class="inp" style=""><input  onchange="readURL(this);" type="file" name="file" required>Browse</label><br><br>
+                <input type="submit" value="Change"  class="inp">
+            </form>
+        </div>
+        <br>
+        
+        {%if title == "Search Results" %}
+        <center>
+            {%if Data_Paginate.has_prev%}
+            
+                <a style="border:2px solid black; text-decoration: none; padding: 6px 12px; background-color:blue; color:white" href="{{url_for('myform',page_num=Data_Paginate.page-1)  + '?txt=' + txt }}" >Prev</a>
+            {%endif%}
+
+            {% for page in Data_Paginate.iter_pages(left_edge=3,right_edge=3,left_current=3,right_current=3) %}
+                {%if page%}
+                    <a style="border:2px solid black; text-decoration: none; padding: 6px 12px;" id="page{{page}}" href="{{url_for('myform',page_num=page)  + '?txt=' + txt  }}">{{page}}</a>
+                {%else%}
+                    ...
+                {%endif%}
+            {%endfor%}
+            
+            {%if Data_Paginate.has_next%}
+                <a style="border:2px solid black; text-decoration: none; padding: 6px 12px; background-color:blue; color:white" href="{{url_for('myform',page_num=Data_Paginate.page+1)  + '?txt=' + txt  }}" >Next</a>
+            {%endif%}
+        </center>
+
+        {%else%}
+        
+        <center>
+            {%if Data_Paginate.has_prev%}
+                <a style="border:2px solid black; text-decoration: none; padding: 6px 12px; background-color:blue; color:white" href="{{url_for('myform',page_num=Data_Paginate.page-1)}}" >Prev</a>
+            {%endif%}
+
+            {% for page in Data_Paginate.iter_pages(left_edge=3,right_edge=3,left_current=3,right_current=3) %}
+                {%if page%}
+                    <a style="border:2px solid black; text-decoration: none; padding: 6px 12px;" id="page{{page}}" href="{{url_for('myform',page_num=page)}}">{{page}}</a>
+                {%else%}
+                    ...
+                {%endif%}
+            {%endfor%}
+            
+            {%if Data_Paginate.has_next%}
+                <a style="border:2px solid black; text-decoration: none; padding: 6px 12px; background-color:blue; color:white" href="{{url_for('myform',page_num=Data_Paginate.page+1)}}" >Next</a>
+            {%endif%}
+        </center>
+        
+        {%endif%}
+        <script type="text/javascript">
+            $("#page{{Data_Paginate.page}}").css('background-color','rgb(239,240,239)')
+        
+            function readURL(input) {
+                if (input.files && input.files[0])
+                {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        $('#pic').attr('src', e.target.result);
+                    };
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+             function fun(x)
+            {
+                if(x=="✔️"){
+                        return confirm('Task Finished✔️ \n Are You Sure To Delete ?');
+                }
+                else{
+                    return confirm('Task Unfinshed❌ \n Are You Sure To Delete ?')
+                }
+                return false;
+            }
+
+            function deleteall()
+            {
+                if(confirm('Are you sure to delete all records?'))
+                window.location='/deleteall'
+            }
+
+            $(function()
+            {
+                var availableTags = [
+
+                {% for row in  Data_Paginate.items %}
+                        "{{row.name}}",
+                    {% endfor %}
+                ];
+
+                $(".srch").autocomplete( {source: availableTags} );
+
+            });
+
+            $('#search-bar').on("keyup",function()
+            {
+                    var value = $(this).val().toLowerCase();
+                    $("table tbody  tr").eq(1).nextAll().filter(function()
+                    {$(this).toggle($(this).text().toLowerCase().indexOf(value) > -1 )}
+                    );
+            });
+
+            $('#sel').change(function()
+            {
+                    if($(this).val()==='1'){
+                        $("table tbody  tr").eq(1).nextAll().filter(function()
+                        {$(this).toggle($(this).text().toLowerCase().indexOf("") > -1 )}
+                        );
+                    }
+                    if($(this).val()==='2'){
+                        $("table tbody  tr").eq(1).nextAll().filter(function()
+                        {$(this).toggle($(this).text().toLowerCase().indexOf("✔️") > -1 )}
+                        );
+                    }
+                    if($(this).val()==='3'){
+                        $("table tbody  tr").eq(1).nextAll().filter(function()
+                        {$(this).toggle($(this).text().toLowerCase().indexOf("❌") > -1 )}
+                        );
+                    }
+
+            });
+
+            //$("#Ntng").submit(function(e){e.preventDefault();})
+
+        </script>
+{%endblock content%}

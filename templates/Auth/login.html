@@ -1,0 +1,102 @@
+<script src="{{ url_for('static', filename='js/jquery.min.js')}}"> </script>
+<script src="{{ url_for('static', filename='js/jquery.modal.min.js')}}"> </script>
+<link href="{{ url_for('static', filename='css/jquery.modal.min.css')}}" rel="stylesheet" type="text/css" />
+
+{%extends "base.html" %} {%block signin %}
+<form class="form" action="{{url_for('login')}}" method="POST">
+    <p>
+        {% if session.logged_in%} You are logged in as {{session.username}} {% endif %}
+    </p>
+
+    <hr>
+    <h2 style="background-color: rgb(38, 38, 43); padding: 20px;">LOGIN</h2>
+    <hr><br>
+    <label> Name:  <br><input autocomplete="on" value="{%if 'usr' in request.cookies %}{{request.cookies.get('usr')}}{% endif %}" placeholder="Enter your username"  required class="srch" type="text"  size="36" name="username"/></label>
+    <br><br>
+    <label> Password:  <br><input autocomplete="on"  id="pswd" value="{% if 'pwd' in request.cookies %}{{request.cookies.get('pwd')}}{% endif %}" placeholder="Enter your password"  required class="srch" type="password"  size="36" name="password"/></label>
+    <br><br>
+    <p id="StrengthDisp" style=" display : none; margin: 10px; padding: 10px; width: 50%; margin: auto; word-wrap: break-word; border-radius: 5px;" ></p>
+    <br>
+    <label> <input type="checkbox" name="remember" > Remember Me </label>
+    
+    <br><br>
+    <input class="inp" type="submit" value="Log In" style="width: 120px;" />
+
+    <p > <u><a style="text-decoration:none; color: rgb(163, 212, 255);" href="#ps" rel="modal:open">Forgot your Password?</a></u></p>
+    <p >Don't have an account? <u><a style="text-decoration:none; color: rgb(163, 212, 255); " href="/signin">Signin</a></u></p>
+</form>
+
+<div id="ps" class="modal">
+    <form id="forgot">
+        <h2>Forgot Password</h2>
+        <label>Email:</label>
+        <br>
+        <input placeholder="Enter your email" type="email" name="nemail" id="nemail" class="srch">
+        <br>
+        <br>
+        <label>New Password:</label>
+        <br>
+        <input placeholder="Enter your new password" autocomplete type="password"  name="new_password" id="new_password" class="srch">
+        <br>
+        <br>
+        <label>Confirm Password:</label>
+        <br>
+        <input placeholder="Confirm your password" autocomplete type="password" name="confirm_password" id="confirm_password" class="srch">
+        <br>
+        <br>
+        <input  class="inp" type="submit" value="Submit">
+    </form>
+
+</div>
+
+<script type="text/javascript">
+    
+    ms = "{{msg}}"
+    if (ms) {
+        alert(ms);
+    }
+
+    $('#forgot').submit(function(e)
+            {
+                e.preventDefault();
+                var email = $('#nemail').val()
+                var new_password = $('#new_password').val()
+                var confirm_password = $('#confirm_password').val()
+                var validr = false;  
+
+          if(new_password.match('(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{8,})')){
+      
+            validr=true
+        }
+          else if(new_password.match('((?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{6,}))|((?=.*[a-z])(?=.*[A-Z])(?=.*[^A-Za-z0-9])(?=.{8,}))')){
+           
+            validr = true
+        }
+          else{
+            validr=false
+        }
+                if(email!="")
+                if(validr)
+                if(new_password===confirm_password )
+                $.ajax(
+                    {
+                        url : '/forgot',
+                        type : 'POST',
+                        data : {email:email,new_password:new_password,confirm_password:confirm_password},                        
+                        success: function(d)
+                                {
+                                    alert(d.status)
+                                    window.location = '/login'
+                                }
+                    });
+                else
+                    alert("Passwords don't Match")
+                else
+                    alert("Password too weak!!")
+                else
+                    alert("Please Enter the email Address")
+                
+            });
+
+</script>
+{% endblock signin %}

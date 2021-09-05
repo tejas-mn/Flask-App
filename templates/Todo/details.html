@@ -1,0 +1,86 @@
+{%extends "base.html" %}
+{%block search %}
+
+    <form class="form"  method="GET">
+            <hr><h2 style="background-color: rgb(38, 38, 43); padding: 20px;">Details</h2><hr><br>
+            <div style="background-color:#3d3d3d; padding:15px; " >
+            <img alt="Click to Choose Profile Picture" src="{{ url_for('static', filename='/images/'+ session['username'] + '//' + UserData.query.filter(UserData.username.contains(session['username'])).first().pic )}}" style="
+                font-size: small;
+                background-color: azure;
+                color: black;
+                border-radius: 100px;
+                border:2px solid white;
+                width: 80px;
+                height: 80px; ">
+            <br>
+            <p>{{UserData.query.filter(UserData.username==(session['username'])).first().username}}</p>
+            <p>{{UserData.query.filter(UserData.username==(session['username'])).first().email}}</p>
+            </div>
+            <br>
+            <p><b style="background-color: rgb(36, 116, 5); padding: 12px;">Title</b><br><br><br>{{Data.query.get(id).name}}</p>
+            <br>
+            <p><b style="background-color: rgb(7, 147, 182); padding: 12px;">Description</b><br><br ><div style="display: inline-block;"><pre>{{Data.query.get(id).desc}}</pre></div></p>
+            <br>
+            <b  style="background-color: rgb(255, 81, 0); padding: 12px;">Deadline</b><br><br>
+            <p id = "deadline" ></p>
+            <br>
+            <p><b style="background-color: rgb(165, 175, 26); padding: 12px;">Status</b><br><br><br>{{Data.query.get(id).status}}</p>
+            <br>
+            <p><b style="background-color: rgb(255, 0, 234); padding: 12px;">Created/Modified</b><br><br><br>{{Data.query.get(id).date}}</p>
+
+    </form>
+
+    <script type="text/javascript">
+        function ddd(){
+
+            var deadline = "{{Data.query.get(id).deadline}}"
+
+            var dd = new Date(deadline);
+            var cd = new Date();
+
+            // To calculate the time difference of two dates
+            var Difference_In_Time = dd.getTime() - cd.getTime();
+
+            // To calculate the no. of days between two dates
+            var Difference_In_Days = Math.ceil(Difference_In_Time / (1000 * 3600 * 24));
+
+            var days_left = "{{Data.query.get(id).deadline}}"+ " ("+  (Difference_In_Days) ;
+            
+            if(parseInt(Difference_In_Days)==1){
+                
+                days_left = "{{Data.query.get(id).deadline}}"+ " (Tommorrow)";
+            }
+            
+            if(parseInt(Difference_In_Days)<0)
+            {
+                days_left += " days ago)";
+            }
+            else if(parseInt(Difference_In_Days)>1)
+            {
+                days_left += " days left)";
+            }
+            
+            if(parseInt(Difference_In_Days)==0){
+                days_left = "{{Data.query.get(id).deadline}}"+ " (Today)";
+            }
+            
+    
+            
+            var x = "{{Data.query.get(id).status}}";
+            if(x=="✔️")
+            {
+                    document.getElementById("deadline").innerHTML=days_left;
+                    alert( "Task Finished✔️\n");
+            }
+            else
+            {
+                //var days_left = "{{Data.query.get(id).deadline}}"+ " ("+ Math.ceil(Difference_In_Days) + " days left)";
+                document.getElementById("deadline").innerHTML=days_left;
+                alert( "Task Unfinshed❌\n"+ Math.ceil(Difference_In_Days) + " day(s) left to complete your task!!");
+            }
+
+        }
+        ddd();
+    </script>
+
+{% endblock search %}
