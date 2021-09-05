@@ -9,7 +9,7 @@ app=Flask(__name__)
 
 UPLOAD_FOLDER = 'static/images'
 
-app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///customer.db'
+app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///Todo.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS']=False
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=15)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
