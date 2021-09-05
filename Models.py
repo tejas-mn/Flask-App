@@ -37,3 +37,4 @@ class UserData(db.Model):
         self.email = email
         self.password = password
         self.pic = pic
+        
