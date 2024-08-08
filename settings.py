@@ -7,7 +7,7 @@ from datetime import timedelta
 
 app=Flask(__name__)
 
-PYTHON_ANYWHERE_PATH = '/home/tejasmn2/mysite/Flask-App'
+PYTHON_ANYWHERE_PATH = '/home/tejasmn2/mysite/Flask-App/'
 UPLOAD_FOLDER = PYTHON_ANYWHERE_PATH + 'static/images'
 
 app.config['SQLALCHEMY_DATABASE_URI']='sqlite:///Todo.db'
