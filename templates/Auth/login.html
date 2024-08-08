@@ -11,9 +11,9 @@
     <hr>
     <h2 style="background-color: rgb(38, 38, 43); padding: 20px;">LOGIN</h2>
     <hr><br>
-    <label> Name:  <br><input autocomplete="on" value="{%if 'usr' in request.cookies %}{{request.cookies.get('usr')}}{% endif %}" placeholder="Enter your username"  required class="srch" type="text"  size="36" name="username"/></label>
+    <label> Name:  <br><input autocomplete="on" value="{%if 'usr' in request.cookies %}{{request.cookies.get('usr')}}{% endif %}" placeholder="Enter your username. Try 'test' "  required class="srch" type="text"  size="36" name="username"/></label>
     <br><br>
-    <label> Password:  <br><input autocomplete="on"  id="pswd" value="{% if 'pwd' in request.cookies %}{{request.cookies.get('pwd')}}{% endif %}" placeholder="Enter your password"  required class="srch" type="password"  size="36" name="password"/></label>
+    <label> Password:  <br><input autocomplete="on"  id="pswd" value="{% if 'pwd' in request.cookies %}{{request.cookies.get('pwd')}}{% endif %}" placeholder="Enter your password. Try 'Test@123' "  required class="srch" type="password"  size="36" name="password"/></label>
     <br><br>
     <p id="StrengthDisp" style=" display : none; margin: 10px; padding: 10px; width: 50%; margin: auto; word-wrap: break-word; border-radius: 5px;" ></p>
     <br>
