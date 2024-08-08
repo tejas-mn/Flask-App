@@ -64,15 +64,15 @@ def set_image(usr_dir):
         os.mkdir(usr_dir)
 
     #file locations to be copied
-    original = app.config['UPLOAD_FOLDER'] + '\\' + 'default.jpg'
-    target = usr_dir + '\\' + 'default.jpg'
+    original = app.config['UPLOAD_FOLDER'] + '/' + 'default.jpg'
+    target = usr_dir + '/' + 'default.jpg'
 
     #copy default.jpg(if exitsts) to user directory
     if(not(os.path.exists(target)) and os.path.exists(original)):
         copyfile(original,target)
     
     #if the user uploaded pic does not exists set it to default.jpg
-    if(os.path.exists(usr_dir + '\\' + res.pic)):
+    if(os.path.exists(usr_dir + '/' + res.pic)):
         return res.pic
     else:
         return "default.jpg"
@@ -91,7 +91,7 @@ def myform(page_num):
     update_days_left()
 
     #Set Image
-    usr_dir = app.config['UPLOAD_FOLDER']+'\\'+session['username']
+    usr_dir = app.config['UPLOAD_FOLDER']+'/'+session['username']
     image = set_image(usr_dir)
 
     #Get item to be searched  
@@ -400,7 +400,7 @@ def upload_image():
     if file and allowed_file(file.filename):
 
         #Get the user directory and filename
-        usr_dir = app.config['UPLOAD_FOLDER']+'\\'+session['username']
+        usr_dir = app.config['UPLOAD_FOLDER']+'/'+session['username']
         filename=secure_filename(file.filename)
 
         #Save the file
