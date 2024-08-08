@@ -17,9 +17,9 @@
                     <li><a href="/dashboard">Dashboard </a></li>
                     <li><a href="/about">About </a></li>
                     <li id="logout" ><a style="color: cornsilk;" href="/logout"> Log Out </a></li>
-                    <li id="acc" ><a style="color: cornsilk;" href="/signin">Sign In | Log In </a></li>
-                    <!--<li><a href="/login">Log In </a></li>-->
-
+                    {% if not session.logged_in%}   
+                        <li id="acc" ><a style="color: cornsilk;" href="/signin">Sign In | Log In </a></li> 
+                    {% endif %}
                 </ul>
         </div>
         <br>
