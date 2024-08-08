@@ -9,6 +9,7 @@ from shutil import copyfile
 from datetime import date,datetime
 import urllib.request
 import os
+import logging
 
 from settings import*
 from Models import*
@@ -91,6 +92,8 @@ def myform(page_num):
     update_days_left()
 
     #Set Image
+    logger = logging.getLogger("my-logger")
+    logger.info("CWD: " + os.getcwd())
     usr_dir = app.config['UPLOAD_FOLDER']+'/'+session['username']
     image = set_image(usr_dir)
 
