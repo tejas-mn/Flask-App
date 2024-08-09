@@ -19,12 +19,12 @@ from Models import*
 ##################################--Git WebHook--#########################################
 
 @app.route('/git_update', methods=['POST'])
-    def webhook():
-        repo = git.Repo('./Flask-App')
-        origin = repo.remotes.origin
-        repo.create_head('master', origin.refs.master).set_tracking_branch(origin.refs.master).checkout()
-        origin.pull()
-        return '', 200
+def webhook():
+    repo = git.Repo('./Flask-App')
+    origin = repo.remotes.origin
+    repo.create_head('master', origin.refs.master).set_tracking_branch(origin.refs.master).checkout()
+    origin.pull()
+    return '', 200
 
 ##################################--Check-if-loggedin-####################################
 
