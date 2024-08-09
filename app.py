@@ -10,6 +10,7 @@ from datetime import date,datetime
 import urllib.request
 import os
 import logging
+import git
 
 from settings import*
 from Models import*
