@@ -45,7 +45,7 @@ def deleteAllTodosOfUser(username):
     pass
 
 #Empty or present
-def getTodoByUser(username):
+def getAllTodoByUserName(username):
     result = Data.query.filter(Data.username == username).all()
     return result
 
@@ -61,8 +61,8 @@ def getUserByEmail(email):
 
 #user with email already exist
 #username is already taken
-def createUser():
-    new_user = UserData(username, email, password, pic)
+def createUser(userObj):
+    new_user = UserData(userObj.username, userObj.email, userObj.password, "default.jpg")
     try:
         db.session.add(new_user)
         db.session.commit()
@@ -79,3 +79,25 @@ def updateUserPassword(email, new_password):
         db.session.commit()
     else:
         pass
+
+def update_days_left():
+    todos = getAllTodoByUserName(session['username'])
+    current_date = date.today()
+    for todo in todos:
+        deadline_date = datetime.strptime(todo.deadline, "%Y-%m-%d").date()
+        days_left = str(deadline_date - current_date)
+        if deadline_date != current_date:
+            days_left = int(days_left.split(' ')[0])
+        else:
+            days_left =0
+            
+        todo.days_left = days_left
+    db.session.commit()
+
+def searchUserTodo(username, search_text):
+    todos = getAllTodoByUserName(username)
+    search_results =  todos.filter(Data.name.contains(search))
+    return search_results
+
+def getPaginatedItems(todos, per_page, page_num):
+    return todos.paginate(per_page = per_page, page = page_num, error_out = False)

@@ -14,7 +14,7 @@ import git
 
 from settings import*
 from Models import*
-
+from db_operations import *
 
 ##################################--Git WebHook--#########################################
 
@@ -44,13 +44,12 @@ def is_logged_in(f):
 @app.route("/")
 @app.route("/home")
 def home():
-    data=render_template("/Todo/home.html" ,title="Home" )
-    return data
+    return render_template("/Todo/home.html" ,title="Home" )
 
 ######################################---Dashboard--######################################
 
 def update_days_left():
-    res = Data.query.filter(Data.username==session['username']).all()
+    res = Data.query.filter(Data.username == session['username']).all()
     current_date = date.today()
     
     for row in res:
@@ -71,7 +70,6 @@ def set_image(usr_dir):
     res=UserData.query.filter(UserData.username==(session['username'])).first()
 
     #Create user directory for each username if it doesnt exists
-    
     if(not(os.path.exists(usr_dir))):
         os.mkdir(usr_dir)
 
@@ -121,21 +119,18 @@ def myform(page_num):
         if "?txt" not in request.referrer:          
             SearchData=s.paginate(per_page=10 ,page=1, error_out = False)
         
-        data=render_template("/Todo/index.html", Data=Data, Data_Paginate=SearchData ,txt=search,UserData = UserData, title="Search Results", image=image, usr_dir = usr_dir)
-        return data
+        return render_template("/Todo/index.html", Data=Data, Data_Paginate=SearchData ,txt=search,UserData = UserData, title="Search Results", image=image, usr_dir = usr_dir)
     
     Data_Paginate = Data.query.filter_by(username=session["username"]).paginate(per_page=10,page=page_num , error_out = False)
 
-    data=render_template("/Todo/index.html", Data=Data, Data_Paginate=Data_Paginate ,UserData = UserData, title="Dashboard", image=image, usr_dir = usr_dir)
-    return data
+    return render_template("/Todo/index.html", Data=Data, Data_Paginate=Data_Paginate ,UserData = UserData, title="Dashboard", image=image, usr_dir = usr_dir)
 
 ####################################--Add-New-Page--######################################
 
 @app.route('/addnew')
 @is_logged_in
 def addnew():
-    data=render_template("/Todo/addnew.html",title="New Todo")
-    return data
+    return render_template("/Todo/addnew.html",title="New Todo")
 
 ################################--Insert-Data--###########################################
 
@@ -187,8 +182,7 @@ def update(id):
     if int(id) not in id_list:
         return render_template("/Errors/404.html",title="Record not found"),404
 
-    data=render_template("/Todo/update.html",id=id,Data=Data , title="Update")
-    return data
+    return render_template("/Todo/update.html",id=id,Data=Data , title="Update")
 
 ######################################--Edit-Data--#######################################
 
@@ -222,7 +216,6 @@ def delete(id):
     db.session.delete(my_data)
     db.session.commit()
 
-    
     flash("Deleted")
     return redirect(url_for('myform',page_num=Data_Paginate.page))
 
@@ -236,8 +229,7 @@ def details(id):
     if int(id) not in id_list:
         return render_template("/Errors/404.html",title="Page not found"),404
 
-    data=render_template("/Todo/details.html",id=id,Data=Data,title="Details" ,UserData=UserData)
-    return data
+    return render_template("/Todo/details.html",id=id,Data=Data,title="Details" ,UserData=UserData)
 
 ######################################--Delete-All--######################################
 
