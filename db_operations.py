@@ -4,6 +4,7 @@ from sqlalchemy import func
 from settings import db
 from Models import Data, UserData
 from datetime import date,datetime
+
 #found or not found todo
 def getTodo(id):
     todo = Data.query.get(id)
@@ -40,13 +41,13 @@ def createTodo( name, desc, deadline, date_created, username):
 
 #todo not found
 #if found update
-def updateTodo(id, todo):
-    new_todo = getTodo(id)
-    new_todo.name = todo.name
-    new_todo.desc = todo.desc
-    new_todo.deadline = todo.deadline
-    new_todo.date = todo.date
-    new_todo.status = todo.status
+def updateTodo(id, name, desc, deadline, date, status):
+    todo = getTodo(id)
+    todo.name = name
+    todo.desc = desc
+    todo.deadline = deadline
+    todo.date = date
+    todo.status = status
     db.session.commit()
 
 #todo not found
@@ -120,3 +121,9 @@ def searchUserTodo(username, search_text):
 
 def getPaginatedItems(todos, per_page, page_num):
     return todos.paginate(per_page = per_page, page = page_num, error_out = False)
+
+def isValidTodoIdForUser(id, username):
+    id_list=[int(todo.id) for todo in getAllTodoByUserName(username)]
+    if id in id_list:
+        return True
+    return False

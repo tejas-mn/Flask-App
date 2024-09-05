@@ -16,7 +16,7 @@ from settings import app, COOKIE_TIME_OUT
 from Models import*
 from db_operations import *
 global Data_Paginate
-  
+
 ##################################--Git WebHook--#########################################
 
 @app.route('/git_update', methods=['POST'])
@@ -62,7 +62,7 @@ def update_days_left():
         if deadline_date != current_date:
             days_left = int(days_left.split(' ')[0])
         else:
-            days_left =0
+            days_left = 0
         row.days_left = days_left
     db.session.commit()
 
@@ -151,26 +151,24 @@ def insert():
 @app.route('/update/<id>', methods = ['GET', 'POST'])
 @is_logged_in
 def update(id):
-    #checks if id belongs to current user else return 404 record not found
-    id_list=[int(row.id) for row in Data.query.filter(Data.username==(session["username"])).all()]
-    if int(id) not in id_list:
-        return render_template("/Errors/404.html",title="Record not found"), 404
+    if not isValidTodoIdForUser(int(id), session["username"]):
+        return render_template("/Errors/404.html", title="Record not found"), 404
 
-    return render_template("/Todo/update.html",id=id,Data=Data , title="Update")
+    return render_template("/Todo/update.html", id=id, Data=Data , title="Update")
 
 ######################################--Edit-Data--#######################################
 
 @app.route('/edit', methods = ['GET', 'POST'])
 @is_logged_in
 def edit():
-    #global Data_Paginate
-    my_data = Data.query.get(request.form.get('id'))
-    my_data.name = request.form.get('name')
-    my_data.desc = request.form.get('desc')
-    my_data.deadline= request.form.get('deadline')
-    my_data.date=request.form.get('date')
-    my_data.status=request.form.get('status')
-    db.session.commit()
+    id = request.form.get('id')
+    name = request.form.get('name')
+    desc = request.form.get('desc')
+    deadline= request.form.get('deadline')
+    date=request.form.get('date')
+    status=request.form.get('status')
+
+    updateTodo(id, name, desc, deadline, date, status)
     
     flash("Updated Existing Record")
     return redirect(url_for('myform',page_num=Data_Paginate.page))
@@ -180,11 +178,8 @@ def edit():
 @app.route('/delete/<id>/', methods = ['GET', 'POST'])
 @is_logged_in
 def delete(id):
-    #global Data_Paginate
-    #checks if id belongs to current user else return 404 record not found
-    id_list=[int(row.id) for row in Data.query.filter(Data.username==(session["username"])).all()]
-    if int(id) not in id_list:
-        return render_template("/Errors/404.html",title="Record not found"),404
+    if not isValidTodoIdForUser(int(id), session["username"]):
+        return render_template("/Errors/404.html",title="Record not found"), 404
 
     deleteTodo(id)
 
@@ -196,10 +191,8 @@ def delete(id):
 @app.route("/details/<id>/")
 @is_logged_in
 def details(id):
-    #checks if id belongs to current user else return 404 record not found
-    id_list=[int(row.id) for row in Data.query.filter(Data.username==(session["username"])).all()]
-    if int(id) not in id_list:
-        return render_template("/Errors/404.html",title="Page not found"),404
+    if not isValidTodoIdForUser(int(id), session["username"]):
+        return render_template("/Errors/404.html",title="Record not found"), 404
 
     return render_template("/Todo/details.html",id=id,Data=Data,title="Details" ,UserData=UserData)
 
@@ -208,8 +201,7 @@ def details(id):
 @app.route('/deleteall/')
 @is_logged_in
 def deleteall():
-    db.session.query(Data).filter(Data.username==session["username"]).delete()
-    db.session.commit()
+    deleteAllTodosOfUser(session["username"])
     flash("Deleted All Records!!")
     return redirect(url_for('myform',page_num=1))
 
