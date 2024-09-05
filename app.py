@@ -12,10 +12,11 @@ import os
 import logging
 import git
 
-from settings import*
+from settings import app, COOKIE_TIME_OUT
 from Models import*
 from db_operations import *
-
+global Data_Paginate
+  
 ##################################--Git WebHook--#########################################
 
 @app.route('/git_update', methods=['POST'])
@@ -137,40 +138,13 @@ def addnew():
 @app.route('/insert', methods = ['GET','POST'])
 @is_logged_in
 def insert():
-    #global Data_Paginate
-
     name = request.form.get('name')
     desc = request.form.get('desc')
     deadline= request.form.get('deadline')
-    status="❌"
     date_created = request.form.get('date')
-    username=session["username"]
-    
-    
-    current_date = date.today()
-    deadline_date = datetime.strptime(deadline, "%Y-%m-%d").date()
-    days_left = (str(deadline_date - current_date))
-    days_left = int(days_left.split(' ')[0])
-    #print(days_left)
-
-    row = Data.query.filter(Data.username==(username))
-    #setting serial number for each user
-    try:
-        if  row[-1].serial_no != None:
-            serial_no = row[-1].serial_no+1
-        else:
-            serial_no=1
-    except IndexError:
-        serial_no=1
-
-    my_data = Data(name, desc, deadline,date_created,status,username,serial_no,days_left)
-    db.session.add(my_data)
-    db.session.commit()
-
-    #Data_Paginate = Data.query.filter_by(username=session["username"]).paginate(per_page=10)
-    
+    createTodo(name, desc, deadline, date_created, session["username"])
     flash("Added New Record")
-    return redirect(url_for('myform',page_num=Data_Paginate.pages))
+    return redirect(url_for('myform', page_num = Data_Paginate.pages))
 
 ######################################--Update-Page--#####################################
 
@@ -180,7 +154,7 @@ def update(id):
     #checks if id belongs to current user else return 404 record not found
     id_list=[int(row.id) for row in Data.query.filter(Data.username==(session["username"])).all()]
     if int(id) not in id_list:
-        return render_template("/Errors/404.html",title="Record not found"),404
+        return render_template("/Errors/404.html",title="Record not found"), 404
 
     return render_template("/Todo/update.html",id=id,Data=Data , title="Update")
 
@@ -212,9 +186,7 @@ def delete(id):
     if int(id) not in id_list:
         return render_template("/Errors/404.html",title="Record not found"),404
 
-    my_data = Data.query.get(id)
-    db.session.delete(my_data)
-    db.session.commit()
+    deleteTodo(id)
 
     flash("Deleted")
     return redirect(url_for('myform',page_num=Data_Paginate.page))
@@ -245,100 +217,94 @@ def deleteall():
 
 @app.route('/signin/' , methods = ['GET', 'POST'])
 def signin():
-    if request.method=="POST":
+    if request.method == "POST":
         username=request.form.get("username")
         email=request.form.get("email")
-        password=sha256_crypt.hash(str(request.form.get("password")))
+        password=request.form.get("password")
 
-        #Set default profile pic whenever user signin
-        pic = "default.jpg"
-        my_data = UserData(username, email, password,pic)
-        db.session.add(my_data)
-
-        #Ensures whether username and email are unique
         try:
-            db.session.commit()
+            createUser({"username" : username, "email" : email, "password" : password})
         except IntegrityError:
-            db.session.rollback()
             flash("Username/Email already exists! Try different name")
             return redirect(url_for('signin'))
 
         flash("Signin Successfull!! Please Login")
         return redirect(url_for('login'))
 
-    return render_template("/Auth/signin.html",Data=Data,title="Signin")
+    return render_template("/Auth/signin.html", title="Signin")
 
 #####################################--Login--############################################
 
 @app.route('/login/' ,methods = ['GET', 'POST'])
 def login():
-    if request.method=="POST":
+    if request.method == "POST":
         username=request.form.get("username")
-        password_candidate=request.form.get("password")
+        password=request.form.get("password")
         remember = request.form.get("remember")
 
-        #Get username and password from cookies
-        usernam = request.cookies.get('usr')
-        password_candidat = request.cookies.get('pwd')
+        #Continue if username and password is found in cookie
+        if 'usr' in request.cookies and 'pwd' in request.cookies:
+            
+            #Get username and password from cookies
+            username_from_cookie = request.cookies.get('usr')
+            password_from_cookie = request.cookies.get('pwd')
 
-        #Continue if details matches from cookies
-        if 'usr' in request.cookies and (password_candidate == password_candidat) and (username == usernam):
-            res=UserData.query.filter(UserData.username==(usernam)).first()
+            if password == password_from_cookie and username == username_from_cookie:
+                user = getUserByName(username_from_cookie)
 
-            if res is not None:
-                 # Get stored hash
-                password = res.password
+                if user is not None:
+                    # Get stored hash
+                    actual_password = user.password
+
+                    # Compare Passwords
+                    #if sha256_crypt.verify(password_from_cookie, password):
+                    if password_from_cookie == actual_password:
+                        # Passed
+                        session['logged_in'] = True
+                        session['username'] = username_from_cookie
+                        
+                        flash('You are now logged in', 'success')
+                        return redirect(url_for('red'))
+                    else:
+                        return render_template("/Auth/login.html", msg="Invalid password Details")
+                else:
+                    return render_template("/Auth/login.html", msg="Invalid email/Password Details", title="Login")
+            else:
+                return render_template("/Auth/login.html", msg="Invalid email/Password Details", title="Login")
+
+        #If cookie doesn't exist
+        elif username and password:
+
+            #Get user data of the entered username
+            user = getUserByName(username)
+            
+            if user is not None:
+                # Get stored hash
+                actual_password = user.password
 
                 # Compare Passwords
-                #if sha256_crypt.verify(password_candidat, password):
-                if password_candidat == password:
-                    # Passed
+                if sha256_crypt.verify(password, actual_password):
+                    #Set the session values
                     session['logged_in'] = True
-                    session['username'] = usernam
-                    
-                    flash('You are now logged in', 'success')
+                    session['username'] = username
+
+                    #If user has clicked remember me set the cookies
+                    if remember:
+                        response = make_response(redirect('/dashboard'))
+                        response.set_cookie('usr', username, max_age=COOKIE_TIME_OUT)
+                        response.set_cookie('pwd', actual_password, max_age=COOKIE_TIME_OUT)
+                        response.set_cookie('rem', 'on', max_age=COOKIE_TIME_OUT)
+                        return response
+
+                    flash('Hello, You are now logged in', 'success')
                     return redirect(url_for('red'))
                 else:
-                    return render_template("/Auth/login.html",msg="Invalid password Details")
+                    return render_template("/Auth/login.html", msg="Invalid password Details")
             else:
+                return render_template("/Auth/login.html", msg="Invalid email/Password Details", title="Login")
 
-                return render_template("/Auth/login.html",msg="Invalid email/Password Details",title="Login")
-
-        #If cookies doesnt exists
-        elif username and password_candidate:
-
-                    #Get user data of the entered username
-                    res=UserData.query.filter(UserData.username==(username)).first()
-
-                    if res is not None:
-                        # Get stored hash
-                        password = res.password
-
-                        # Compare Passwords
-                        if sha256_crypt.verify(password_candidate, password):
-                            #Set the session values
-                            session['logged_in'] = True
-                            session['username'] = username
-
-                            #If user has clicked remember me set the cookies
-                            if remember:
-                                resp = make_response(redirect('/dashboard'))
-                                resp.set_cookie('usr',username,max_age=COOKIE_TIME_OUT)
-                                resp.set_cookie('pwd',password,max_age=COOKIE_TIME_OUT)
-                                resp.set_cookie('rem','on',max_age=COOKIE_TIME_OUT)
-                                return resp
-
-                            flash('You are now logged in', 'success')
-                            flash("Hello")
-                            return redirect(url_for('red'))
-                        else:
-                            return render_template("/Auth/login.html",msg="Invalid password Details")
-                    else:
-                        return render_template("/Auth/login.html",msg="Invalid email/Password Details",title="Login")
-
-
-    if request.method=="GET":
-        return render_template("/Auth/login.html",Data=Data ,title="Login")
+    else:
+        return render_template("/Auth/login.html", title="Login")
 
 #######################################--Logout--#########################################
 
@@ -347,7 +313,6 @@ def login():
 def logout():
     #Clear the session once user logs out
     session.clear()
-
     flash('You are now logged out', 'success')
     return redirect(url_for('login'))
 
@@ -357,18 +322,9 @@ def logout():
 def forgot():
     email = request.form.get('email')
     new_password = request.form.get('new_password')
-    print(email,new_password)
 
-    #Query user data based on entered email
-    res=UserData.query.filter(UserData.email==(email)).first()
-
-    if res:
-        res.password=sha256_crypt.hash(str(new_password))
-        db.session.commit()
-
+    if updateUserPassword(email, new_password): 
         flash("Password reset successfully!! Please enter the new password")
-        #Return json response to ajax call bcoz JS will recieve back redirect and render
-        #template as result of call without changing DOM
         return jsonify({"status":"Password reset successfully"})
     else:
         return jsonify({"status":"Incorrect Email"})

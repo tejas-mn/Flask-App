@@ -3,17 +3,35 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy import func
 from settings import db
 from Models import Data, UserData
-
+from datetime import date,datetime
 #found or not found todo
 def getTodo(id):
     todo = Data.query.get(id)
     return todo
 
 #add todo to db
-def createTodo():
+def createTodo( name, desc, deadline, date_created, username):
+    current_date = date.today()
+    status = "❌"
+    deadline_date = datetime.strptime(deadline, "%Y-%m-%d").date()
+    days_left = (str(deadline_date - current_date))
+    days_left = int(days_left.split(' ')[0])
+
+    row = Data.query.filter(Data.username==(username))
+    
+    #setting serial number for each todo
+    try:
+        if  row[-1].serial_no != None:
+            serial_no = row[-1].serial_no+1
+        else:
+            serial_no=1
+    except IndexError:
+        serial_no=1
+        
     my_data = Data(
         name, desc, deadline, date_created, status, username, serial_no, days_left
     )
+    
     try:
         db.session.add(my_data)
         db.session.commit()
@@ -62,7 +80,7 @@ def getUserByEmail(email):
 #user with email already exist
 #username is already taken
 def createUser(userObj):
-    new_user = UserData(userObj.username, userObj.email, userObj.password, "default.jpg")
+    new_user = UserData(userObj["username"], userObj["email"], sha256_crypt.hash(str(userObj["password"])), "default.jpg")
     try:
         db.session.add(new_user)
         db.session.commit()
@@ -72,13 +90,14 @@ def createUser(userObj):
 #user with email not found
 #old password same as new password
 def updateUserPassword(email, new_password):
-    res = UserData.query.filter(UserData.email == email).first()
+    user = getUserByEmail(email)
 
-    if res:
-        res.password = sha256_crypt.hash(str(new_password))
+    if user:
+        user.password = sha256_crypt.hash(str(new_password))
         db.session.commit()
+        return True
     else:
-        pass
+        return False
 
 def update_days_left():
     todos = getAllTodoByUserName(session['username'])
