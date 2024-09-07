@@ -115,9 +115,12 @@ def update_days_left():
     db.session.commit()
 
 def searchUserTodo(username, search_text):
-    todos = getAllTodoByUserName(username)
-    search_results =  todos.filter(Data.name.contains(search))
+    search_results = Data.query.filter_by(username = username).filter(Data.name.contains(search_text))
     return search_results
+
+def filterTodosByUserName(username):
+    filtered_todos = Data.query.filter_by(username = username)
+    return filtered_todos
 
 def getPaginatedItems(todos, per_page, page_num):
     return todos.paginate(per_page = per_page, page = page_num, error_out = False)

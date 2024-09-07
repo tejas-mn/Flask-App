@@ -12,7 +12,7 @@ import os
 import logging
 import git
 
-from settings import app, COOKIE_TIME_OUT
+from settings import app, COOKIE_TIME_OUT, ALLOWED_EXTENSIONS
 from Models import*
 from db_operations import *
 global Data_Paginate
@@ -111,18 +111,19 @@ def myform(page_num):
     search = request.args.get("txt")
 
     if search:
-        s=Data.query.filter_by(username=session["username"]).filter(Data.name.contains(search))
-        SearchData=s.paginate(per_page=10 ,page=page_num, error_out = False)
+        search_results = searchUserTodo(session["username"], search)
+        SearchData = getPaginatedItems(search_results, 10, page_num)
         
         #request.referrer gives the link from where you came to this route
         #If search request came from dashboard
         #Got to page 1 of search result
         if "?txt" not in request.referrer:          
-            SearchData=s.paginate(per_page=10 ,page=1, error_out = False)
+            SearchData = getPaginatedItems(search_results, 10, 1)
         
         return render_template("/Todo/index.html", Data=Data, Data_Paginate=SearchData ,txt=search,UserData = UserData, title="Search Results", image=image, usr_dir = usr_dir)
     
-    Data_Paginate = Data.query.filter_by(username=session["username"]).paginate(per_page=10,page=page_num , error_out = False)
+    Data_Paginate = filterTodosByUserName(session["username"])
+    Data_Paginate = getPaginatedItems(Data_Paginate, 10, page_num)
 
     return render_template("/Todo/index.html", Data=Data, Data_Paginate=Data_Paginate ,UserData = UserData, title="Dashboard", image=image, usr_dir = usr_dir)
 
