@@ -1,3 +1,11 @@
+from db_operations import *
+from flask import  session
+import os 
+from settings import app
+from werkzeug.utils import secure_filename
+
+ALLOWED_EXTENSIONS = set(['png','jpg','jpeg','gif'])
+
 #Returns true if file extension is allowed else false
 def allowed_file(filename):
     #print(filename.rsplit('.',1)) #list with first item as filename and 2nd item as extension
@@ -20,12 +28,12 @@ def set_image(usr_dir):
         copyfile(original,target)
     
     #if the user uploaded pic does not exists set it to default.jpg
-    if(os.path.exists(usr_dir + '/' + res.pic)):
-        return res.pic
+    if(os.path.exists(usr_dir + '/' + user.pic)):
+        return user.pic
     else:
         return "default.jpg"
     
-def upload_image(request_file):
+def upload_requested_image(request_file):
     #If file exists and it is allowed
     if request_file and allowed_file(request_file.filename):
 
@@ -41,14 +49,14 @@ def upload_image(request_file):
         
         if user:
             try:
-                if(user.pic!="default.jpg" and user.pic != filename):
+                if(user.pic != "default.jpg" and user.pic != filename):
                     os.remove(os.path.join(usr_dir, user.pic))
             except:
                 pass
             
             user.pic = filename
             db.session.commit()
-                    
-        pass
+            return True
+        return False
     else:
-        pass
+        return False

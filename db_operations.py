@@ -100,8 +100,8 @@ def updateUserPassword(email, new_password):
     else:
         return False
 
-def update_days_left():
-    todos = getAllTodoByUserName(session['username'])
+def update_days_left(username):
+    todos = getAllTodoByUserName(username)
     current_date = date.today()
     for todo in todos:
         deadline_date = datetime.strptime(todo.deadline, "%Y-%m-%d").date()

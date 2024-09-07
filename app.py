@@ -1,7 +1,6 @@
 from flask import Flask, render_template, flash, redirect, url_for, session, request, logging, make_response,jsonify
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy import func
 from passlib.hash import sha256_crypt
 from functools import wraps
 from werkzeug.utils import secure_filename
@@ -16,6 +15,7 @@ from settings import app, COOKIE_TIME_OUT, ALLOWED_EXTENSIONS
 from Models import*
 from db_operations import *
 global Data_Paginate
+from helpers import set_image, upload_requested_image
 
 ##################################--Git WebHook--#########################################
 
@@ -35,9 +35,8 @@ def is_logged_in(f):
     def wrap(*args, **kwargs):
         if 'logged_in' in session:
             return f(*args, **kwargs)
-        else:
-            flash('Unauthorized, Please login', 'danger')
-            return redirect(url_for('login'))
+        flash('Unauthorized, Please login', 'danger')
+        return redirect(url_for('login'))
     return wrap
 
 #######################################---Home--##########################################
@@ -48,45 +47,6 @@ def home():
     return render_template("/Todo/home.html" ,title="Home" )
 
 ######################################---Dashboard--######################################
-
-def update_days_left():
-    res = Data.query.filter(Data.username == session['username']).all()
-    current_date = date.today()
-    
-    for row in res:
-        #print(row.deadline)
-        deadline_date = datetime.strptime(row.deadline, "%Y-%m-%d").date()
-        days_left = (str(deadline_date - current_date))
-        
-        #print(row.deadline,days_left)
-        if deadline_date != current_date:
-            days_left = int(days_left.split(' ')[0])
-        else:
-            days_left = 0
-        row.days_left = days_left
-    db.session.commit()
-
-def set_image(usr_dir):
-    #Query user data based on current user
-    res=UserData.query.filter(UserData.username==(session['username'])).first()
-
-    #Create user directory for each username if it doesnt exists
-    if(not(os.path.exists(usr_dir))):
-        os.mkdir(usr_dir)
-
-    #file locations to be copied
-    original = app.config['UPLOAD_FOLDER'] + '/' + 'default.jpg'
-    target = usr_dir + '/' + 'default.jpg'
-
-    #copy default.jpg(if exitsts) to user directory
-    if(not(os.path.exists(target)) and os.path.exists(original)):
-        copyfile(original,target)
-    
-    #if the user uploaded pic does not exists set it to default.jpg
-    if(os.path.exists(usr_dir + '/' + res.pic)):
-        return res.pic
-    else:
-        return "default.jpg"
 
 @app.route("/dashboard/")
 @is_logged_in
@@ -99,12 +59,12 @@ def myform(page_num):
     global Data_Paginate
 
     #Update the days left 
-    update_days_left()
+    update_days_left(session['username'])
 
     #Set Image
     logger = logging.getLogger("my-logger")
     logger.info("CWD: " + os.getcwd())
-    usr_dir = app.config['UPLOAD_FOLDER']+'/'+session['username']
+    usr_dir = os.path.join(app.config['UPLOAD_FOLDER'], session['username'])
     image = set_image(usr_dir)
 
     #Get item to be searched  
@@ -122,8 +82,7 @@ def myform(page_num):
         
         return render_template("/Todo/index.html", Data=Data, Data_Paginate=SearchData ,txt=search,UserData = UserData, title="Search Results", image=image, usr_dir = usr_dir)
     
-    Data_Paginate = filterTodosByUserName(session["username"])
-    Data_Paginate = getPaginatedItems(Data_Paginate, 10, page_num)
+    Data_Paginate = getPaginatedItems(filterTodosByUserName(session["username"]), 10, page_num)
 
     return render_template("/Todo/index.html", Data=Data, Data_Paginate=Data_Paginate ,UserData = UserData, title="Dashboard", image=image, usr_dir = usr_dir)
 
@@ -337,7 +296,8 @@ def allowed_file(filename):
 
 @app.route('/upload_image' , methods = ['POST'])
 def upload_image():
-    #global Data_Paginate
+    global Data_Paginate
+    
     #check if file is sent or not
     if 'file' not in request.files:
         flash('No file part')
@@ -351,32 +311,12 @@ def upload_image():
         flash('No image selected')
         return redirect(request.url)
 
-    #If file exists and it is allowed
-    if file and allowed_file(file.filename):
-
-        #Get the user directory and filename
-        usr_dir = app.config['UPLOAD_FOLDER']+'/'+session['username']
-        filename=secure_filename(file.filename)
-
-        #Save the file
-        file.save(os.path.join(usr_dir, filename))
-
-        #Removes the previous profile pic(if its not default.jpg and prev pic !=current filename) and updates the pic to current filename in the database
-        res=UserData.query.filter(UserData.username==(session['username'])).first()
-        if res:
-            try:
-                if(res.pic!="default.jpg"  and res.pic!=filename):
-                    os.remove(os.path.join(usr_dir,res.pic))
-            except :
-                pass
-            res.pic=filename
-            db.session.commit()
-
-        flash('IMAGE UPLOADED')
-        return redirect(url_for('myform',page_num=Data_Paginate.page))
+    if upload_requested_image(file):
+        flash('Image Upload Successfully')
     else:
-        flash("Allowed Image Types - [jpg, png, jpeg, gif]")
-        return redirect(url_for('myform',page_num=Data_Paginate.page))
+        flash("Something Went Wrong ! Allowed Image Types - [jpg, png, jpeg, gif]")
+    
+    return redirect(url_for('myform',page_num=Data_Paginate.page))
 
 #######################################--Dues--##########################################
 @app.route('/dues')
