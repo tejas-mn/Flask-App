@@ -44,7 +44,7 @@ def is_logged_in(f):
 @app.route("/")
 @app.route("/home")
 def home():
-    return render_template("/Todo/home.html" ,title="Home" )
+    return render_template("/Todo/home.html" , title="Home" )
 
 ######################################---Dashboard--######################################
 
@@ -62,8 +62,8 @@ def myform(page_num):
     update_days_left(session['username'])
 
     #Set Image
-    logger = logging.getLogger("my-logger")
-    logger.info("CWD: " + os.getcwd())
+    # logger = logging.getLogger("my-logger")
+    # logger.info("CWD: " + os.getcwd())
     usr_dir = os.path.join(app.config['UPLOAD_FOLDER'], session['username'])
     image = set_image(usr_dir)
 
@@ -285,7 +285,7 @@ def forgot():
 
 @app.route('/about/' ,methods = ['GET', 'POST'])
 def about():
-    return render_template("/Todo/about.html",Data=Data , title="About")
+    return render_template("/Todo/about.html", title="About")
 
 ########################################--UPLOAD-IMAGE--##########################################
 
@@ -322,7 +322,7 @@ def upload_image():
 @app.route('/dues')
 @is_logged_in
 def dues():
-    return render_template("/Todo/display_dues.html", Data=Data,title="Dues" ,UserData=UserData )
+    return render_template("/Todo/display_dues.html", Data=Data, title="Dues" )
 ########################################--MAIN--##########################################
 
 if __name__ =='__main__':
