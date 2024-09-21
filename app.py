@@ -17,6 +17,10 @@ from db_operations import *
 global Data_Paginate
 from helpers import set_image, upload_requested_image
 
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 ##################################--Git WebHook--#########################################
 
 @app.route('/git_update', methods=['POST'])
@@ -25,6 +29,7 @@ def webhook():
     origin = repo.remotes.origin
     #repo.create_head('master', origin.refs.master).set_tracking_branch(origin.refs.master).checkout()
     origin.pull()
+    logger.info("Git repository updated.")
     return '', 200
 
 ##################################--Check-if-loggedin-####################################
@@ -61,9 +66,7 @@ def myform(page_num):
     #Update the days left 
     update_days_left(session['username'])
 
-    #Set Image
-    # logger = logging.getLogger("my-logger")
-    # logger.info("CWD: " + os.getcwd())
+    logger.info("CWD: " + os.getcwd())
     usr_dir = os.path.join(app.config['UPLOAD_FOLDER'], session['username'])
     image = set_image(usr_dir)
 
